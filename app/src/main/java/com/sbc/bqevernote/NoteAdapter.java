@@ -10,12 +10,14 @@ import android.view.animation.AnimationUtils;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.evernote.client.android.type.NoteRef;
+
 import java.util.ArrayList;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 
 	private Context mContext;
-	private ArrayList<String> mItems;
+	private ArrayList<NoteRef> mItems;
 	// Allows to remember the last item shown on screen
 	private int lastPosition = -1;
 
@@ -23,7 +25,6 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 
 	public class ViewHolder extends RecyclerView.ViewHolder {
 		TextView title;
-		TextView date;
 		// We need to retrieve the container because it's the view that will be animated
 		RelativeLayout container;
 
@@ -32,19 +33,18 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 			container = (RelativeLayout) itemView
 					.findViewById(R.id.item_content_container);
 			title = (TextView) itemView.findViewById(R.id.titleTextView);
-			date = (TextView) itemView.findViewById(R.id.dateTextView);
 		}
 
-		public void bindNote(String note) {
-			if (!note.equals("")) {
-				title.setText(note);
+		public void bindNote(NoteRef note) {
+			if (!note.getTitle().equals("")) {
+				title.setText(note.getTitle());
 			} else {
 				title.setText("");
 			}
 		}
 	}
 
-	public NoteAdapter(ArrayList<String> mItems, Context context, int resLayout) {
+	public NoteAdapter(ArrayList<NoteRef> mItems, Context context, int resLayout) {
 		this.mItems = mItems;
 		this.mContext = context;
 
@@ -61,7 +61,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 
 	@Override
 	public void onBindViewHolder(ViewHolder holder, int position) {
-		String note = mItems.get(position);
+		NoteRef note = mItems.get(position);
 		if (note != null) {
 			holder.bindNote(note);
 		}
@@ -88,7 +88,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 		return mItems.size();
 	}
 
-    public void updateNoteItems(ArrayList<String> items){
+    public void updateNoteItems(ArrayList<NoteRef> items){
         this.mItems = items;
 		notifyDataSetChanged();
     }
