@@ -2,6 +2,7 @@ package com.sbc.bqevernote;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -9,13 +10,15 @@ import android.view.View;
 
 import java.util.ArrayList;
 
-public class NoteListActivity extends AppCompatActivity {
+public class NoteListActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener{
 
     private boolean twoPane = false;
 
     private RecyclerView recyclerView;
 
     private ArrayList<String> notes;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +39,13 @@ public class NoteListActivity extends AppCompatActivity {
             twoPane = false;
         }
 
+        notes = new ArrayList<String>();
+
         recyclerView = (RecyclerView) findViewById(R.id.item_list);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+
         setupRecyclerView(recyclerView, this);
+        swipeRefreshLayout.setOnRefreshListener(this);
     }
 
     private void setupRecyclerView(RecyclerView recyclerView, Context context) {
@@ -60,5 +68,10 @@ public class NoteListActivity extends AppCompatActivity {
                     public void onItemLongClick(RecyclerView parent, View clickedView, int position) {}
 
                 }));
+    }
+
+    @Override
+    public void onRefresh() {
+        swipeRefreshLayout.setRefreshing(false);
     }
 }
