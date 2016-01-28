@@ -1,13 +1,13 @@
 package com.sbc.bqevernote;
 
 import android.os.AsyncTask;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 
 import com.evernote.client.android.EvernoteSession;
 import com.evernote.client.android.asyncclient.EvernoteSearchHelper;
 import com.evernote.client.android.type.NoteRef;
 import com.evernote.edam.notestore.NoteFilter;
-import com.evernote.edam.type.NoteSortOrder;
 import com.evernote.edam.type.Notebook;
 
 import java.util.ArrayList;
@@ -17,12 +17,14 @@ public class FindNotesTask extends AsyncTask<Void,Integer,ArrayList<NoteRef>> {
 
     private final EvernoteSearchHelper.Search mSearch;
     private RecyclerView recyclerView;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
-    public FindNotesTask(int offset, int maxNotes, Notebook notebook, RecyclerView recyclerView) {
+    public FindNotesTask(int offset, int maxNotes, Notebook notebook, RecyclerView recyclerView, SwipeRefreshLayout swipeRefreshLayout, int order) {
         this.recyclerView = recyclerView;
+        this.swipeRefreshLayout = swipeRefreshLayout;
 
         NoteFilter noteFilter = new NoteFilter();
-        noteFilter.setOrder(NoteSortOrder.UPDATED.getValue());
+        noteFilter.setOrder(order);
 
         if (notebook != null) {
             noteFilter.setNotebookGuid(notebook.getGuid());
@@ -34,6 +36,12 @@ public class FindNotesTask extends AsyncTask<Void,Integer,ArrayList<NoteRef>> {
                 .setNoteFilter(noteFilter);
 
         mSearch.addScope(EvernoteSearchHelper.Scope.PERSONAL_NOTES);
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        swipeRefreshLayout.setRefreshing(true);
     }
 
     @Override
@@ -58,5 +66,6 @@ public class FindNotesTask extends AsyncTask<Void,Integer,ArrayList<NoteRef>> {
         if(noteRefs.size()>0){
             ((NoteAdapter)recyclerView.getAdapter()).updateNoteItems(noteRefs);
         }
+        swipeRefreshLayout.setRefreshing(false);
     }
 }

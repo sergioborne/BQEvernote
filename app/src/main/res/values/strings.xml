@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">BQEvernote</string>
+
+    <string name="login">Login</string>
+    <string name="sort">Sort</string>
+    <string name="view">View</string>
 </resources>

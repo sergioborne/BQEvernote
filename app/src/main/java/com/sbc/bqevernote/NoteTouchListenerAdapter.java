@@ -82,7 +82,7 @@ public class NoteTouchListenerAdapter extends
 
 		view.setPressed(false);
 //		view.setPressed(true);
-		int position = recyclerView.getChildPosition(view);
+		int position = recyclerView.getChildAdapterPosition(view);
 		listener.onItemClick(recyclerView, view, position);
 		return true;
 	}

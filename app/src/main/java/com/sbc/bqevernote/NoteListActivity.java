@@ -3,6 +3,7 @@ package com.sbc.bqevernote;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -11,11 +12,14 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.evernote.client.android.EvernoteSession;
 import com.evernote.client.android.login.EvernoteLoginFragment;
 import com.evernote.client.android.type.NoteRef;
+import com.evernote.edam.type.NoteSortOrder;
 
 import java.util.ArrayList;
 
@@ -30,9 +34,7 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
 
-    private ArrayList<NoteRef> notes;
-
-
+    private int noteOrder = NoteSortOrder.TITLE.getValue();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,21 +67,22 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
             twoPane = false;
         }
 
-        notes = new ArrayList<NoteRef>();
-
         recyclerView = (RecyclerView) findViewById(R.id.item_list);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-
-        setupRecyclerView(recyclerView, this);
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        if (!EvernoteSession.getInstance().isLoggedIn()) {
-            EvernoteSession.getInstance().authenticate(this);
+        if(savedInstanceState==null) {
+            setupRecyclerView(recyclerView, this);
+            if (!EvernoteSession.getInstance().isLoggedIn()) {
+                EvernoteSession.getInstance().authenticate(this);
+            } else {
+                loadNotes();
+            }
         }
     }
 
-    private void setupRecyclerView(RecyclerView recyclerView, Context context) {
-        recyclerView.setAdapter(new NoteAdapter(notes, context, R.layout.note_list_content));
+    private void setupRecyclerView(final RecyclerView recyclerView, Context context) {
+        recyclerView.setAdapter(new NoteAdapter(new ArrayList<NoteRef>(), context, R.layout.note_list_content));
 
         //We can setup layout manager here or in xml
 //        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
@@ -91,24 +94,38 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
                     @Override
                     public void onItemClick(RecyclerView parent,
                                             View clickedView, int position) {
-
+                        NoteRef note = ((NoteAdapter)recyclerView.getAdapter()).getItemInPosition(position);
+                        if (twoPane) {
+                            Bundle arguments = new Bundle();
+                            arguments.putParcelable(NoteDetailFragment.ARG_NOTE, note);
+                            NoteDetailFragment fragment = new NoteDetailFragment();
+                            fragment.setArguments(arguments);
+                            getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.item_detail_container, fragment)
+                                    .commit();
+                        } else {
+                            Intent intent = new Intent(activity, NoteDetailActivity.class);
+                            intent.putExtra(NoteDetailFragment.ARG_NOTE, note);
+                            startActivity(intent);
+                        }
                     }
 
                     @Override
-                    public void onItemLongClick(RecyclerView parent, View clickedView, int position) {}
+                    public void onItemLongClick(RecyclerView parent, View clickedView, int position) {
+                    }
 
                 }));
     }
 
     @Override
     public void onRefresh() {
-        swipeRefreshLayout.setRefreshing(false);
+        loadNotes();
     }
 
     @Override
     public void onLoginFinished(boolean successful) {
         if(successful){
-            new FindNotesTask(0, MAX_NOTES, null, recyclerView).execute();
+            loadNotes();
         }else{
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Login");
@@ -128,5 +145,35 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
             });
             builder.show();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the main; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.changeOrder) {
+            if(noteOrder == NoteSortOrder.UPDATED.getValue()) {
+                noteOrder = NoteSortOrder.TITLE.getValue();
+                item.setIcon(R.drawable.ic_action_sort_date);
+            }else{
+                noteOrder = NoteSortOrder.UPDATED.getValue();
+                item.setIcon(R.drawable.ic_action_sort_alphabetically);
+            }
+            //We reload the whole list looking for changes done, for example an updated note which
+            //update time would be modified.
+            loadNotes();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void loadNotes(){
+        new FindNotesTask(0, MAX_NOTES, null, recyclerView, swipeRefreshLayout, noteOrder).execute();
     }
 }

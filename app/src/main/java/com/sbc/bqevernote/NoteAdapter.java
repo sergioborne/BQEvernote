@@ -92,4 +92,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
         this.mItems = items;
 		notifyDataSetChanged();
     }
+
+	public NoteRef getItemInPosition(int position){
+		return mItems.get(position);
+	}
 }

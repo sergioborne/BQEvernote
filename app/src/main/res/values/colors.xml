@@ -6,4 +6,6 @@
 
     <color name="darkGray">#555</color>
     <color name="backgroundMainColor">#EEEEEE</color>
+    <color name="dividerGray">#66666666</color>
+
 </resources>
