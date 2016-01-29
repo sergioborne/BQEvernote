@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.evernote.client.android.type.NoteRef;
+import com.sbc.bqevernote.task.GetNoteDetailsTask;
 
 
 public class NoteDetailFragment extends Fragment {

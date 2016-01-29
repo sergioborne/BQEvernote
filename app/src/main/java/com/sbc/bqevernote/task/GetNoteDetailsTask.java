@@ -1,4 +1,4 @@
-package com.sbc.bqevernote;
+package com.sbc.bqevernote.task;
 
 import android.os.AsyncTask;
 import android.text.Html;

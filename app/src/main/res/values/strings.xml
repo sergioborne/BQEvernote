@@ -4,4 +4,9 @@
     <string name="login">Login</string>
     <string name="sort">Sort</string>
     <string name="view">View</string>
+
+    <string name="note_content">Note Content</string>
+    <string name="create_new_note">Create new note</string>
+    <string name="create">Create</string>
+    <string name="note_title">Note Title</string>
 </resources>

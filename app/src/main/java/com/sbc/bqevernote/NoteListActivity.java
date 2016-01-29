@@ -20,6 +20,8 @@ import com.evernote.client.android.EvernoteSession;
 import com.evernote.client.android.login.EvernoteLoginFragment;
 import com.evernote.client.android.type.NoteRef;
 import com.evernote.edam.type.NoteSortOrder;
+import com.sbc.bqevernote.task.CreateNewNoteTask;
+import com.sbc.bqevernote.task.FindNotesTask;
 
 import java.util.ArrayList;
 
@@ -52,8 +54,7 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                new CreateNoteDialogFragment().show(getSupportFragmentManager(), CreateNoteDialogFragment.TAG);
             }
         });
 
@@ -94,7 +95,7 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
                     @Override
                     public void onItemClick(RecyclerView parent,
                                             View clickedView, int position) {
-                        NoteRef note = ((NoteAdapter)recyclerView.getAdapter()).getItemInPosition(position);
+                        NoteRef note = ((NoteAdapter) recyclerView.getAdapter()).getItemInPosition(position);
                         if (twoPane) {
                             Bundle arguments = new Bundle();
                             arguments.putParcelable(NoteDetailFragment.ARG_NOTE, note);
@@ -175,5 +176,25 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
 
     private void loadNotes(){
         new FindNotesTask(0, MAX_NOTES, null, recyclerView, swipeRefreshLayout, noteOrder).execute();
+    }
+
+    public void createNewNote(final String title, String content) {
+        new CreateNewNoteTask(title, content, new CreateNewNoteTask.OnCompleteListener() {
+            @Override
+            public void onComplete(int result) {
+                switch (result){
+                    case 0:{
+                        Snackbar.make(swipeRefreshLayout, "Note \"" + title + "\" created", Snackbar.LENGTH_LONG).show();
+                        //We get whole notes again to have an updated "online" version of the notes.
+                        loadNotes();
+                        break;
+                    }
+                    case 1:{
+                        Snackbar.make(swipeRefreshLayout, "Error creating your note", Snackbar.LENGTH_LONG).show();
+                        break;
+                    }
+                }
+            }
+        }).execute();
     }
 }

@@ -1,4 +1,4 @@
-package com.sbc.bqevernote;
+package com.sbc.bqevernote.task;
 
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -9,6 +9,7 @@ import com.evernote.client.android.asyncclient.EvernoteSearchHelper;
 import com.evernote.client.android.type.NoteRef;
 import com.evernote.edam.notestore.NoteFilter;
 import com.evernote.edam.type.Notebook;
+import com.sbc.bqevernote.NoteAdapter;
 
 import java.util.ArrayList;
 
