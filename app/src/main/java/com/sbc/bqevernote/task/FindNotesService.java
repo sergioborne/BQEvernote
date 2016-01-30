@@ -60,11 +60,13 @@ public class FindNotesService extends IntentService {
             e.printStackTrace();
         }
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        //This lines are used to test device screen rotation chase, because request is as fast enough to
+        //not give time to recreate.
+//        try {
+//            Thread.sleep(3000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
         Bundle b= new Bundle();
         b.putParcelableArrayList(NoteListActivity.NOTES_TAG, list);
