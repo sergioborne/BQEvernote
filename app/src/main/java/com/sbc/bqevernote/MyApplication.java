@@ -6,6 +6,8 @@ import com.evernote.client.android.EvernoteSession;
 
 public class MyApplication extends Application{
 
+    public final static String LOG_TAG = "BQEvernote";
+
     private static final String CONSUMER_KEY = "";
     private static final String CONSUMER_SECRET = "";
 

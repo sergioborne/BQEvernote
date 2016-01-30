@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -12,6 +13,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,11 +23,18 @@ import com.evernote.client.android.login.EvernoteLoginFragment;
 import com.evernote.client.android.type.NoteRef;
 import com.evernote.edam.type.NoteSortOrder;
 import com.sbc.bqevernote.task.CreateNewNoteTask;
-import com.sbc.bqevernote.task.FindNotesTask;
+import com.sbc.bqevernote.task.FindNotesService;
+import com.sbc.bqevernote.task.MyResultReceiver;
 
 import java.util.ArrayList;
 
-public class NoteListActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, EvernoteLoginFragment.ResultCallback{
+public class NoteListActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, EvernoteLoginFragment.ResultCallback, MyResultReceiver.Receiver{
+
+    public static final String NOTES_TAG = "notes";
+    public static final String RECEIVER_TAG = "receiverTag";
+    public static final String ORDER_TAG = "order";
+    public static final String MAX_NOTES_TAG = "maxNotes";
+    public static final String REFRESHING_TAG = "refreshing";
 
     private static final int MAX_NOTES = 20;
 
@@ -36,7 +45,10 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
 
-    private int noteOrder = NoteSortOrder.TITLE.getValue();
+    private int noteOrder = NoteSortOrder.UPDATED.getValue();
+
+    private ArrayList<NoteRef> notes;
+    public MyResultReceiver mReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +70,8 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
             }
         });
 
+
+
         if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -72,18 +86,31 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this);
 
+        notes = new ArrayList<>();
+        setupRecyclerView(recyclerView, this);
         if(savedInstanceState==null) {
-            setupRecyclerView(recyclerView, this);
+            mReceiver = new MyResultReceiver(new Handler());
+            mReceiver.setReceiver(this);
             if (!EvernoteSession.getInstance().isLoggedIn()) {
                 EvernoteSession.getInstance().authenticate(this);
             } else {
                 loadNotes();
             }
+        }else{
+            notes = savedInstanceState.getParcelableArrayList(NOTES_TAG);
+            //Update recycler items to be the same as before rotating
+            ((NoteAdapter)recyclerView.getAdapter()).updateNoteItems(notes);
+            mReceiver = savedInstanceState.getParcelable(RECEIVER_TAG);
+            //Reasign receiver to receive in this new instance the event
+            mReceiver.setReceiver(this);
+            if(savedInstanceState.getBoolean(REFRESHING_TAG)){
+                setRefreshingEnabled();
+            }
         }
     }
 
     private void setupRecyclerView(final RecyclerView recyclerView, Context context) {
-        recyclerView.setAdapter(new NoteAdapter(new ArrayList<NoteRef>(), context, R.layout.note_list_content));
+        recyclerView.setAdapter(new NoteAdapter(notes, context, R.layout.note_list_content));
 
         //We can setup layout manager here or in xml
 //        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
@@ -175,7 +202,15 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
     }
 
     private void loadNotes(){
-        new FindNotesTask(0, MAX_NOTES, null, recyclerView, swipeRefreshLayout, noteOrder).execute();
+//        new FindNotesTask(0, MAX_NOTES, null, recyclerView, swipeRefreshLayout, noteOrder).execute();
+
+            setRefreshingEnabled();
+
+        Intent i = new Intent(this, FindNotesService.class);
+        i.putExtra(MAX_NOTES_TAG, MAX_NOTES);
+        i.putExtra(ORDER_TAG, noteOrder);
+        i.putExtra(RECEIVER_TAG, mReceiver);
+        startService(i);
     }
 
     public void createNewNote(final String title, String content) {
@@ -196,5 +231,38 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
                 }
             }
         }).execute();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(RECEIVER_TAG, mReceiver);
+        outState.putParcelableArrayList(NOTES_TAG, notes);
+        outState.putBoolean(REFRESHING_TAG, swipeRefreshLayout.isRefreshing());
+    }
+
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+        Log.d(MyApplication.LOG_TAG, "onReceiveResult");
+        ArrayList<NoteRef> noteRefs = resultData.getParcelableArrayList(NOTES_TAG);
+        if(noteRefs.size()>0){
+            notes = noteRefs;
+            ((NoteAdapter)recyclerView.getAdapter()).updateNoteItems(noteRefs);
+        }
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+    //We need to use this method because setRefreshingEnabled is only launched after
+    //onMeasue is completed, but we need before.
+    private void setRefreshingEnabled(){
+        if(swipeRefreshLayout!=null) {
+            swipeRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    swipeRefreshLayout.setRefreshing(true);
+                }
+            });
+        }
     }
 }
