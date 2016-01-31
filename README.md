@@ -34,6 +34,7 @@ Debido a que la clase RecyclerView no dispone de un evento OnItemClick, se ha te
 Aprovechamos el diseño de las apps de Android para añadir esta funcionalidad en el FAB. Se ha implementado un sencillo dialogo con dos campos de texto para introducir título y contenido. Después se llama a otro método de la API y se sincroniza la nueva nota.
 
 **6.  Al crear una nota, se podrá elegir entre crearla mediante el teclado o bien escribir sobre la pantalla; donde un OCR convertirá la escritura en tipografía de computadora..**
+
 La idea para esta parte es añadir otro dialogo o actividad en la parte de crear una nota que permita la introduccion de texto escrito a mano, como si de un teclado se tratase, pero integrado en la app.
 Sabiendo que google saco el año pasado un teclado con reconocimiento de escritura a mano, el primer paso ha sido buscar si habian liberado alguna API al respecto. Parece ser que no.
 Otra alternativa sería la búsqueda de alguna librería en la que basar el funcionamiento. Se han encontrado algunas, pero las que son open source no parecen funcionar correctamente (ademas que son muy antiguas, pero se podrian refactorizar), y las que parecen funcionar bien son de pago. La que mejor pinta tiene y que usan grandes aplicaciones como Khan Academy, es MyScript (https://dev.myscript.com/).
