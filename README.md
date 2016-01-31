@@ -17,7 +17,7 @@ Uso de la API de Evernote para Android que incluye una pantalla de login para au
 
 **2. Una vez introducidos los credenciales, se mostrarán en pantalla todas las notas creadas por el usuario.**
 
-Creación de una AsyncTask para obtener la lista de las notas en segundo plano. Sustitución de esta por un Servicio para desacoplarlo de la Activity y poder lidiar con los cambios de orientación, etc...
+Creación de una AsyncTask para obtener la lista de las notas en segundo plano. Sustitución de esta por un Servicio para desacoplarlo de la Activity y poder lidiar con los cambios de orientación, etc... Se ha usado un recycler view y un adapter para mostrar los resultados.
 
 **3. Dicha pantalla tendrá un menú desplegable con dos opciones, una de ellas ordenará la lista por el título de la nota y la otra por fecha de creación o modificación.**
 
@@ -27,6 +27,7 @@ Uso del método de la API de Evernote que permite ordenar las busquedas por titu
 
 Creación de una nueva vista desde la que mostrar los detalles de la nota seleccionada. Para obtener la información se vuelve a usar otro método de la API de Evernote que te devuelve el contenido de la nota en HTML para despues parsearlo y pasarselo a un TextView.
 En este caso y viendo que la ejecución era bastante rapida se ha optado por usar una AsyncTask, aunque se puede hacer igual que en el caso de listar las notas y pasar a usar un Servicio (incluso el mismo que el anterior pero con un Intent diferente).
+Debido a que la clase RecyclerView no dispone de un evento OnItemClick, se ha tenido que implementar un OnTouchListener junto con un Gesture Detector para suplirlo. Se podría haber optado por añadir el evento directamente en la vista que infla el adapter, pero creo mas adecuado este enfoque.
 
 **5. Existirá un botón para “añadir nota” que permitirá crear una nota (con título y cuerpo) y posteriormente guardarla.**
 
