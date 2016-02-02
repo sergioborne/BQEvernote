@@ -1,4 +1,4 @@
-package com.sbc.bqevernote.task;
+package com.sbc.bqevernote.tasks;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -10,7 +10,7 @@ import com.evernote.client.android.asyncclient.EvernoteSearchHelper;
 import com.evernote.client.android.type.NoteRef;
 import com.evernote.edam.notestore.NoteFilter;
 import com.evernote.edam.type.NoteSortOrder;
-import com.sbc.bqevernote.NoteListActivity;
+import com.sbc.bqevernote.activities.NoteListActivity;
 
 import java.util.ArrayList;
 

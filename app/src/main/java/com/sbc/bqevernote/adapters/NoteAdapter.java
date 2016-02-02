@@ -1,4 +1,4 @@
-package com.sbc.bqevernote;
+package com.sbc.bqevernote.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.evernote.client.android.type.NoteRef;
+import com.sbc.bqevernote.R;
 
 import java.util.ArrayList;
 
@@ -22,6 +23,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 	private int lastPosition = -1;
 
 	private int mResLayout;
+
+	private int selectedPosition = -1;
 
 	public class ViewHolder extends RecyclerView.ViewHolder {
 		TextView title;
@@ -35,12 +38,13 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 			title = (TextView) itemView.findViewById(R.id.titleTextView);
 		}
 
-		public void bindNote(NoteRef note) {
+		public void bindNote(NoteRef note, int position) {
 			if (!note.getTitle().equals("")) {
 				title.setText(note.getTitle());
 			} else {
 				title.setText("");
 			}
+//			container.setSelected(isSelectedPosition(position));
 		}
 	}
 
@@ -49,6 +53,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 		this.mContext = context;
 
 		this.mResLayout = resLayout;
+//		if(mItems.size()>0){
+//			mItems.get(0).setShowingDetails(true);
+//		}
+//		setHasStableIds(true);
 	}
 
 	@Override
@@ -63,7 +71,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 	public void onBindViewHolder(ViewHolder holder, int position) {
 		NoteRef note = mItems.get(position);
 		if (note != null) {
-			holder.bindNote(note);
+			holder.bindNote(note, position);
 		}
 		setAnimation(holder.itemView, position);
 	}
@@ -96,4 +104,20 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 	public NoteRef getItemInPosition(int position){
 		return mItems.get(position);
 	}
+
+//	private boolean isSelectedPosition(int position){
+//		return position == selectedPosition;
+//	}
+//
+//	public int getSelectedPosition() {
+//		return selectedPosition;
+//	}
+//
+//	public void setSelectedPosition(int selectedPosition) {
+//		this.selectedPosition = selectedPosition;
+//	}
+//
+//	public int getItemPosition(NoteRef note){
+//		return mItems.indexOf(note);
+//	}
 }

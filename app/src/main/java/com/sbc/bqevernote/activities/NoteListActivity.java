@@ -1,15 +1,13 @@
-package com.sbc.bqevernote;
+package com.sbc.bqevernote.activities;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -17,14 +15,22 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 
 import com.evernote.client.android.EvernoteSession;
 import com.evernote.client.android.login.EvernoteLoginFragment;
 import com.evernote.client.android.type.NoteRef;
 import com.evernote.edam.type.NoteSortOrder;
-import com.sbc.bqevernote.task.CreateNewNoteTask;
-import com.sbc.bqevernote.task.FindNotesService;
-import com.sbc.bqevernote.task.MyResultReceiver;
+import com.sbc.bqevernote.DividerItemDecoration;
+import com.sbc.bqevernote.MyApplication;
+import com.sbc.bqevernote.R;
+import com.sbc.bqevernote.adapters.NoteAdapter;
+import com.sbc.bqevernote.adapters.NoteTouchListenerAdapter;
+import com.sbc.bqevernote.fragments.CreateNoteDialogFragment;
+import com.sbc.bqevernote.fragments.NoteDetailFragment;
+import com.sbc.bqevernote.tasks.CreateNewNoteTask;
+import com.sbc.bqevernote.tasks.FindNotesService;
+import com.sbc.bqevernote.tasks.MyResultReceiver;
 
 import java.util.ArrayList;
 
@@ -50,6 +56,9 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
     private ArrayList<NoteRef> notes;
     public MyResultReceiver mReceiver;
 
+    private Button loginButton;
+    private FloatingActionButton fab;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,15 +71,13 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 new CreateNoteDialogFragment().show(getSupportFragmentManager(), CreateNoteDialogFragment.TAG);
             }
         });
-
-
 
         if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
@@ -85,6 +92,13 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
         recyclerView = (RecyclerView) findViewById(R.id.item_list);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this);
+        loginButton = (Button) findViewById(R.id.loginButton);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EvernoteSession.getInstance().authenticate(NoteListActivity.this);
+            }
+        });
 
         notes = new ArrayList<>();
         setupRecyclerView(recyclerView, this);
@@ -92,7 +106,7 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
             mReceiver = new MyResultReceiver(new Handler());
             mReceiver.setReceiver(this);
             if (!EvernoteSession.getInstance().isLoggedIn()) {
-                EvernoteSession.getInstance().authenticate(this);
+                EvernoteSession.getInstance().authenticate(NoteListActivity.this);
             } else {
                 loadNotes();
             }
@@ -110,6 +124,10 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
     }
 
     private void setupRecyclerView(final RecyclerView recyclerView, Context context) {
+        RecyclerView.ItemDecoration itemDecoration = new
+                DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST);
+        recyclerView.addItemDecoration(itemDecoration);
+
         recyclerView.setAdapter(new NoteAdapter(notes, context, R.layout.note_list_content));
 
         //We can setup layout manager here or in xml
@@ -131,6 +149,7 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
                             getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.item_detail_container, fragment)
                                     .commit();
+//                            ((NoteAdapter) recyclerView.getAdapter()).setSelectedPosition(position);
                         } else {
                             Intent intent = new Intent(activity, NoteDetailActivity.class);
                             intent.putExtra(NoteDetailFragment.ARG_NOTE, note);
@@ -153,25 +172,31 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
     @Override
     public void onLoginFinished(boolean successful) {
         if(successful){
+            Log.d(MyApplication.LOG_TAG, "onLoginFinished - Succesful");
+            findViewById(R.id.noLoginLayout).setVisibility(View.GONE);
+            fab.show();
             loadNotes();
         }else{
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Login");
-            builder.setMessage("Login required");
-            builder.setPositiveButton("Login", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    EvernoteSession.getInstance().authenticate(activity);
-                    dialog.dismiss();
-                }
-            });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            builder.show();
+//            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//            builder.setTitle(R.string.loginRequired);
+//            builder.setMessage(R.string.loginRequiredMessage);
+//            builder.setPositiveButton(R.string.login, new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    EvernoteSession.getInstance().authenticate(activity);
+//                    dialog.dismiss();
+//                }
+//            });
+//            builder.setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    activity.finish();
+//                    dialog.dismiss();
+//                }
+//            });
+//            builder.show();
+
+            findViewById(R.id.noLoginLayout).setVisibility(View.VISIBLE);
         }
     }
 
@@ -204,13 +229,15 @@ public class NoteListActivity extends AppCompatActivity implements SwipeRefreshL
     private void loadNotes(){
 //        new FindNotesTask(0, MAX_NOTES, null, recyclerView, swipeRefreshLayout, noteOrder).execute();
 
+        if(EvernoteSession.getInstance().isLoggedIn()) {
             setRefreshingEnabled();
 
-        Intent i = new Intent(this, FindNotesService.class);
-        i.putExtra(MAX_NOTES_TAG, MAX_NOTES);
-        i.putExtra(ORDER_TAG, noteOrder);
-        i.putExtra(RECEIVER_TAG, mReceiver);
-        startService(i);
+            Intent i = new Intent(this, FindNotesService.class);
+            i.putExtra(MAX_NOTES_TAG, MAX_NOTES);
+            i.putExtra(ORDER_TAG, noteOrder);
+            i.putExtra(RECEIVER_TAG, mReceiver);
+            startService(i);
+        }
     }
 
     public void createNewNote(final String title, String content) {

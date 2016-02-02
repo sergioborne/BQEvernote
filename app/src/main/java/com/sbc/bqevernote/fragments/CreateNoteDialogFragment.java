@@ -1,4 +1,4 @@
-package com.sbc.bqevernote;
+package com.sbc.bqevernote.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -9,6 +9,9 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
+
+import com.sbc.bqevernote.activities.NoteListActivity;
+import com.sbc.bqevernote.R;
 
 /**
  * @author rwondratschek

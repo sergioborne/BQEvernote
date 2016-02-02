@@ -1,10 +1,13 @@
-package com.sbc.bqevernote;
+package com.sbc.bqevernote.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+
+import com.sbc.bqevernote.R;
+import com.sbc.bqevernote.fragments.NoteDetailFragment;
 
 public class NoteDetailActivity extends AppCompatActivity {
 

@@ -13,7 +13,7 @@
  * /
  */
 
-package com.sbc.bqevernote;
+package com.sbc.bqevernote.adapters;
 
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;

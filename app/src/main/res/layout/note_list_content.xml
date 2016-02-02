@@ -15,11 +15,11 @@
         android:textAppearance="@style/TitleListElement"
         android:ellipsize="end"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2px"
-        android:paddingLeft="2dp"
-        android:paddingRight="2dp"
-        android:background="@color/dividerGray"
-        android:layout_alignParentBottom="true"/>
+    <!--<View-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="2px"-->
+        <!--android:paddingLeft="2dp"-->
+        <!--android:paddingRight="2dp"-->
+        <!--android:background="@color/dividerGray"-->
+        <!--android:layout_alignParentBottom="true"/>-->
 </RelativeLayout>

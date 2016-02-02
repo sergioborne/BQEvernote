@@ -1,7 +1,11 @@
 <resources>
     <string name="app_name">BQEvernote</string>
 
+    <string name="loginRequiredMessage">We need you to sign in to your Evernote account in order to get listed your notes.</string>
+
     <string name="login">Login</string>
+    <string name="loginRequired">Login Required</string>
+    <string name="exit">Exit App</string>
     <string name="sort">Sort</string>
     <string name="view">View</string>
 

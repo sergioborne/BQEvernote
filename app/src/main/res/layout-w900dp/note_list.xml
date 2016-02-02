@@ -9,25 +9,26 @@
     android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
     android:showDividers="middle"
-    tools:context=".NoteListActivity">
+    tools:context=".activities.NoteListActivity">
 
     <!--
     This layout is a two-pane layout for the Items
     master/detail flow.
     
     -->
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/item_width"
         android:layout_height="match_parent">
         <android.support.v7.widget.RecyclerView
             android:id="@+id/item_list"
-            android:layout_width="@dimen/item_width"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             app:layoutManager="LinearLayoutManager"
-            tools:context=".NoteListActivity" />
+            tools:context=".activities.NoteListActivity" />
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <FrameLayout

@@ -1,4 +1,4 @@
-package com.sbc.bqevernote.task;
+package com.sbc.bqevernote.tasks;
 
 import android.os.Bundle;
 import android.os.Handler;

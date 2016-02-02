@@ -10,7 +10,7 @@
         android:name=".MyApplication"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".NoteListActivity"
+        <activity android:name=".activities.NoteListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -18,15 +18,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".NoteDetailActivity"
-            android:parentActivityName=".NoteListActivity"
+            android:name=".activities.NoteDetailActivity"
+            android:parentActivityName=".activities.NoteListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".NoteListActivity" />
+                android:value=".activities.NoteListActivity" />
         </activity>
         <service
-            android:name=".task.FindNotesService"
+            android:name=".tasks.FindNotesService"
             android:exported="false"/>
     </application>
 

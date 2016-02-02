@@ -1,4 +1,4 @@
-package com.sbc.bqevernote;
+package com.sbc.bqevernote.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -10,7 +10,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.evernote.client.android.type.NoteRef;
-import com.sbc.bqevernote.task.GetNoteDetailsTask;
+import com.sbc.bqevernote.R;
+import com.sbc.bqevernote.tasks.GetNoteDetailsTask;
 
 
 public class NoteDetailFragment extends Fragment {

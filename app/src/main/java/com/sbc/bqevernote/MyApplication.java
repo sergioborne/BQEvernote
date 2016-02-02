@@ -8,8 +8,8 @@ public class MyApplication extends Application{
 
     public final static String LOG_TAG = "BQEvernote";
 
-    private static final String CONSUMER_KEY = "";
-    private static final String CONSUMER_SECRET = "";
+    private static final String CONSUMER_KEY = "vigimuertos";
+    private static final String CONSUMER_SECRET = "c01fa153efe90b94";
 
     private static final EvernoteSession.EvernoteService EVERNOTE_SERVICE = EvernoteSession.EvernoteService.SANDBOX;
 
